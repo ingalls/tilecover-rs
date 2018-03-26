@@ -2,5 +2,16 @@
 name = "tilecover"
 version = "0.1.0"
 authors = ["ingalls <ingalls@protonmail.com>"]
+description = "Generate the minimum number of tiles to cover a geometry"
+
+homepage = "https://github.com/ingalls/tilecover"
+repository = "https://github.com/ingalls/tilecover"
+
+readme = "README.md"
+
+categories = ["algorithms"]
+license = "MIT"
+
+maintenance = { status = "actively-developed" }
 
 [dependencies]
