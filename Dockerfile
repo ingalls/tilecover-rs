@@ -5,11 +5,7 @@ ENV SHELL /bin/bash
 
 # set the locale
 RUN apt-get update -y \
-    && apt-get install -y \
-        curl \
-        git \
-    && locale-gen en_US.UTF-8 \
-    && bash -c "echo \"America/New_York\" > /etc/timezone"
+    && apt-get install -y curl git
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
