@@ -12,4 +12,4 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 WORKDIR /usr/local/src/tilecover
 ADD . /usr/local/src/tilecover
 
-CMD cargo test
+CMD  ~/.cargo/bin/cargo test
