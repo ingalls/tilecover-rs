@@ -15,3 +15,4 @@ license = "MIT"
 maintenance = { status = "actively-developed" }
 
 [dependencies]
+postgis = "0.6.0"

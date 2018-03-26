@@ -1,7 +1,14 @@
+extern crate postgis;
+
 use std::f64::consts::PI;
 
 const D2R: f64 = PI / 180.0;
 const _R2D: f64 = 180.0 / PI;
+
+pub fn tiles(_geom: String, _limits: Option<(u8, u8)>) -> Vec<(i32, i32, u8)> {
+
+    vec!((10, 10, 1))
+}
 
 /**
  *  * Get the tile for a point at a specified zoom level
