@@ -51,9 +51,7 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 pub fn point_to_tile(lon: f64, lat: f64, z: u8) -> (i32, i32, u8) {
     let tile_frac = point_to_tile_fraction(lon, lat, z);
 
-    let tile: (i32, i32, u8) = (tile_frac.0.floor() as i32, tile_frac.1.floor() as i32, tile_frac.2);
-
-    tile
+    (tile_frac.0.floor() as i32, tile_frac.1.floor() as i32, tile_frac.2)
 }
 
 /**
