@@ -1,6 +1,6 @@
 [package]
 name = "tilecover"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["ingalls <ingalls@protonmail.com>"]
 description = "Generate the minimum number of tiles to cover a geometry"
 
