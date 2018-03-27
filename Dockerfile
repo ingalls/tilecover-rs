@@ -5,7 +5,7 @@ ENV SHELL /bin/bash
 
 # set the locale
 RUN apt-get update -y \
-    && apt-get install -y curl git gcc build-essentials
+    && apt-get install -y curl git gcc build-essential
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
