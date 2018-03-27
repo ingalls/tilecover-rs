@@ -1,14 +1,48 @@
-extern crate postgis;
+extern crate geo;
 
+use std::collections::HashMap;
 use std::f64::consts::PI;
-use postgis::ewkb::Geometry;
+use geo::*;
 
 const D2R: f64 = PI / 180.0;
 const _R2D: f64 = 180.0 / PI;
 
-pub fn tiles(geom: Geometry, _limits: Option<(u8, u8)>) -> Vec<(i32, i32, u8)> {
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    GeomTypeNotSupported
+}
 
-    vec!((10, 10, 1))
+pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Error> {
+    match geom {
+        &geo::Geometry::Point(ref point) => {
+            Ok(vec!(point_to_tile(point.lat(), point.lng(), zoom)))
+        },
+        &geo::Geometry::MultiPoint(ref points) => {
+            let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
+
+            for point in points.clone() {
+                let tile = point_to_tile(point.lat(), point.lng(), zoom);
+                if !tiles.contains(&tile) {
+                    tiles.push(tile)
+                }
+            }
+
+            Ok(tiles)
+        },
+        &geo::Geometry::LineString(ref linestring) => {
+            Ok(vec!((10, 10, 1)))
+        },
+        &geo::Geometry::MultiLineString(ref linestrings) => {
+            Ok(vec!((10, 10, 1)))
+        },
+        &geo::Geometry::Polygon(ref polygon) => {
+            Ok(vec!((10, 10, 1)))
+        },
+        &geo::Geometry::MultiPolygon(ref polygons) => {
+            Ok(vec!((10, 10, 1)))
+        },
+        _ => Err(Error::GeomTypeNotSupported)
+    }
 }
 
 /**
@@ -45,6 +79,31 @@ pub fn point_to_tile_fraction(lon: f64, lat: f64, z: u8) -> (f64, f64, u8) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_point() {
+        let point = Point::new(-77.15664982795715, 38.87419791355846);
+        let geom = point.into();
+        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (1, 1, 1) ]);
+        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (2, 3, 2) ]);
+        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 6, 3) ]);
+        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 13, 4) ]);
+    }
+
+    #[test]
+    fn test_points() {
+        let points: MultiPoint<_> = vec![
+            ( -84.48486328124999, 43.40504748787035 ),
+            ( -90.87890625, 39.90973623453719 ),
+            ( -84.55078125, 43.45291889355468 ), 
+            ( -90.8349609375, 39.93711893299021 )
+        ].into();
+        let geom = points.into();
+        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (1, 1, 1), (1, 2, 1) ]);
+        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (2, 3, 2), (2, 5, 2) ]);
+        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 7, 3), (4, 10, 3) ]);
+        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 15, 4), (9, 20, 4) ]);
+    }
 
     #[test]
     fn test_point_to_tile_fraction() {
