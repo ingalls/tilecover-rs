@@ -53,8 +53,8 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 }
 
 pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, mut ring: Option<Vec<(i32, i32)>>) {
-    let mut prevX: Option<f64> = None;
-    let mut prevY: Option<f64> = None;
+    let mut prev_x: Option<f64> = None;
+    let mut prev_y: Option<f64> = None;
 
     let mut i = 0;
     while i < linestring.0.len() - 1 {
@@ -63,8 +63,10 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
 
         let x0 = start.0;
         let y0 = start.1;
+
         let x1 = stop.0;
         let y1 = stop.1;
+
         let dx = x1 - x0;
         let dy = y1 - y0;
 
@@ -79,13 +81,13 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
         let mut x = x0.floor();
         let mut y = y0.floor();
 
-        let mut tMaxX = if dx == 0.0 {
+        let mut t_max_x = if dx == 0.0 {
             INF
         } else {
             (((if dx > 0.0 { 1.0 } else { 0.0 }) + x - x0) / dx).abs()
         };
 
-        let mut tMaxY = if dy == 0.0 {
+        let mut t_max_y = if dy == 0.0 {
             INF
         } else {
             (((if dy > 0.0 { 1.0 } else { 0.0 }) + y - y0) / dy).abs()
@@ -94,40 +96,40 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
         let tdx = (sx / dx).abs();
         let tdy = (sy / dy).abs();
 
-        if Some(x) != prevX || Some(y) != prevY {
+        if Some(x) != prev_x || Some(y) != prev_y {
             tiles.push((x as i32, y as i32, zoom));
 
-            if ring != None && Some(y) != prevY {
+            if ring != None && Some(y) != prev_y {
                 match ring {
                     Some(ref mut r) => r.push((x as i32, y as i32)),
                     _ => ()
                 };
             }
 
-            prevX = Some(x);
-            prevY = Some(y);
+            prev_x = Some(x);
+            prev_y = Some(y);
         }
 
-        while tMaxX < 1.0 || tMaxY < 1.0 {
-            if tMaxX < tMaxY {
-                tMaxX = tMaxX + tdx;
+        while t_max_x < 1.0 || t_max_y < 1.0 {
+            if t_max_x < t_max_y {
+                t_max_x = t_max_x + tdx;
                 x = x + sx;
             } else {
-                tMaxY = tMaxY + tMaxY + tdy;
+                t_max_y = t_max_y + tdy;
                 y = y + sy;
             }
 
             tiles.push((x as i32, y as i32, zoom));
 
-            if ring != None && Some(y) != prevY {
+            if ring != None && Some(y) != prev_y {
                 match ring {
                     Some(ref mut r) => r.push((x as i32, y as i32)),
                     _ => ()
                 };
             }
 
-            prevX = Some(x);
-            prevY = Some(y);
+            prev_x = Some(x);
+            prev_y = Some(y);
         }
 
         if ring != None {
@@ -261,18 +263,18 @@ mod tests {
 
         let geom = line.into();
         assert_eq!(tiles(&geom, 12).unwrap(), vec![
-            ( 842, 1704, 12 ),
-            ( 843, 1704, 12 ),
-            ( 840, 1705, 12 ),
-            ( 841, 1705, 12 ),
-            ( 842, 1705, 12 ),
-            ( 843, 1705, 12 ),
-            ( 840, 1706, 12 ),
-            ( 843, 1706, 12 ),
             ( 839, 1707, 12 ),
-            ( 840, 1707, 12 ),
-            ( 843, 1707, 12 ),
             ( 839, 1708, 12 ),
+            ( 840, 1705, 12 ),
+            ( 840, 1706, 12 ),
+            ( 840, 1707, 12 ),
+            ( 841, 1705, 12 ),
+            ( 842, 1704, 12 ),
+            ( 842, 1705, 12 ),
+            ( 843, 1704, 12 ),
+            ( 843, 1705, 12 ),
+            ( 843, 1706, 12 ),
+            ( 843, 1707, 12 ),
             ( 843, 1708, 12 )
         ])
     }
