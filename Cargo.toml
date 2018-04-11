@@ -12,7 +12,5 @@ readme = "README.md"
 categories = ["algorithms"]
 license = "MIT"
 
-maintenance = { status = "actively-developed" }
-
 [dependencies]
 geo = "0.7.4"
