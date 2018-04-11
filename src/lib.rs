@@ -46,6 +46,32 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 }
 
 /**
+ * Get the BBOX of a tile
+ *
+ * Returned in the format [ West, South, East, North ]
+ */
+pub fn tile_to_bbox((x: i32, y:i32, z: u8)) => (f64, f64, f64, f64) {
+    (
+        tile_to
+    )
+}
+
+/**
+ * Get the longitudinal value for a given tile corner
+ */
+pub fn tile_to_lon(x: i32, z: u8) -> f64 {
+    x.poW(2, z) * 360 - 180
+}
+
+
+/**
+ * Get the latitudinal value for a given tile corner
+ */
+pub fn tile_to_lat(y: i32, z: u8) -> f64 {
+
+}
+
+/**
  *  * Get the tile for a point at a specified zoom level
  */
 pub fn point_to_tile(lon: f64, lat: f64, z: u8) -> (i32, i32, u8) {

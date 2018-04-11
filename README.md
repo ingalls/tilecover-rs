@@ -7,4 +7,7 @@
   <a href="https://crates.io/crates/tilecover"><img src="https://img.shields.io/crates/v/tilecover.svg"/></a>
 </p>
 
-<p align=center>Rust port of <a href="https://github.com/mapbox/tile-cover">@mapbox/tile-cover</a></p>
+<p align=center>
+    Rust port of <a href="https://github.com/mapbox/tile-cover">@mapbox/tile-cover</a> and
+    <a href="https://github.com/mapbox/tilebelt">@mapbox/tilebelt</a>
+</p>
