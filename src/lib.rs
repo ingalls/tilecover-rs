@@ -1,6 +1,7 @@
 extern crate geo;
 
 use std::f64::consts::PI;
+use std::f64::INFINITY as INF;
 use geo::*;
 
 const D2R: f64 = PI / 180.0;
@@ -29,7 +30,14 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
             Ok(tiles)
         },
         &geo::Geometry::LineString(ref linestring) => {
-            Ok(vec!((10, 10, 1)))
+            let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
+
+            line_cover(&mut tiles, linestring, zoom, None);
+
+            tiles.sort();
+            tiles.dedup();
+
+            Ok(tiles)
         },
         &geo::Geometry::MultiLineString(ref linestrings) => {
             Ok(vec!((10, 10, 1)))
@@ -44,6 +52,99 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
     }
 }
 
+pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, mut ring: Option<Vec<(i32, i32)>>) {
+    let mut prevX: Option<f64> = None;
+    let mut prevY: Option<f64> = None;
+
+    let mut i = 0;
+    while i < linestring.0.len() - 1 {
+        let start = point_to_tile_fraction(linestring.0[i].x(), linestring.0[i].y(), zoom);
+        let stop = point_to_tile_fraction(linestring.0[i + 1].x(), linestring.0[i + 1].y(), zoom);
+
+        let x0 = start.0;
+        let y0 = start.1;
+        let x1 = stop.0;
+        let y1 = stop.1;
+        let dx = x1 - x0;
+        let dy = y1 - y0;
+
+        if dy == 0.0 && dx == 0.0 {
+            i = i + 1;
+            continue;
+        }
+
+        let sx = if dx > 0.0 { 1.0 } else { -1.0 };
+        let sy = if dy > 0.0 { 1.0 } else { -1.0 };
+
+        let mut x = x0.floor();
+        let mut y = y0.floor();
+
+        let mut tMaxX = if dx == 0.0 {
+            INF
+        } else {
+            (((if dx > 0.0 { 1.0 } else { 0.0 }) + x - x0) / dx).abs()
+        };
+
+        let mut tMaxY = if dy == 0.0 {
+            INF
+        } else {
+            (((if dy > 0.0 { 1.0 } else { 0.0 }) + y - y0) / dy).abs()
+        };
+
+        let tdx = (sx / dx).abs();
+        let tdy = (sy / dy).abs();
+
+        if Some(x) != prevX || Some(y) != prevY {
+            tiles.push((x as i32, y as i32, zoom));
+
+            if ring != None && Some(y) != prevY {
+                match ring {
+                    Some(ref mut r) => r.push((x as i32, y as i32)),
+                    _ => ()
+                };
+            }
+
+            prevX = Some(x);
+            prevY = Some(y);
+        }
+
+        while tMaxX < 1.0 || tMaxY < 1.0 {
+            if tMaxX < tMaxY {
+                tMaxX = tMaxX + tdx;
+                x = x + sx;
+            } else {
+                tMaxY = tMaxY + tMaxY + tdy;
+                y = y + sy;
+            }
+
+            tiles.push((x as i32, y as i32, zoom));
+
+            if ring != None && Some(y) != prevY {
+                match ring {
+                    Some(ref mut r) => r.push((x as i32, y as i32)),
+                    _ => ()
+                };
+            }
+
+            prevX = Some(x);
+            prevY = Some(y);
+        }
+
+        if ring != None {
+            match ring {
+                Some(ref mut r) => {
+                    if y as i32 == r[0].1 {
+                        r.pop();
+                    }
+                },
+                _ => ()
+            }
+        }
+
+        i = i + 1;
+    }
+}
+
 pub fn get_children(tile: (i32, i32, u8)) -> Vec<(i32, i32, u8)> {
     vec![
         (tile.0 * 2, tile.1 * 2, tile.2 + 1),
@@ -54,7 +155,7 @@ pub fn get_children(tile: (i32, i32, u8)) -> Vec<(i32, i32, u8)> {
 }
 
 pub fn get_parent(tile: (i32, i32, u8)) -> (i32, i32, u8) {
-    (tile.0 >> 1, tile.1 >> 1, tile.2 - 1)    
+    (tile.0 >> 1, tile.1 >> 1, tile.2 - 1)
 }
 
 pub fn get_siblings(tile: (i32, i32, u8)) -> Vec<(i32, i32, u8)> {
@@ -116,7 +217,7 @@ pub fn point_to_tile_fraction(lon: f64, lat: f64, z: u8) -> (f64, f64, u8) {
     if x < 0.0 {
         x = x + z2
     }
-    
+
     (x, y, z)
 }
 
@@ -136,10 +237,10 @@ mod tests {
 
     #[test]
     fn test_points() {
-        let points: MultiPoint<_> = vec![
+        let points: MultiPoint<f64> = vec![
             ( -84.48486328124999, 43.40504748787035 ),
             ( -90.87890625, 39.90973623453719 ),
-            ( -84.55078125, 43.45291889355468 ), 
+            ( -84.55078125, 43.45291889355468 ),
             ( -90.8349609375, 39.93711893299021 )
         ].into();
         let geom = points.into();
@@ -148,7 +249,34 @@ mod tests {
         assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 7, 3), (4, 10, 3) ]);
         assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 15, 4), (9, 20, 4) ]);
     }
-  
+
+    #[test]
+    fn test_line() {
+        let line = LineString(vec![
+            Point::new(-106.21719360351562, 28.592359801121567),
+            Point::new(-106.1004638671875, 28.791130513231813),
+            Point::new(-105.87661743164062, 28.864519767126602),
+            Point::new(-105.82374572753905, 28.60743139267596)
+        ]);
+
+        let geom = line.into();
+        assert_eq!(tiles(&geom, 12).unwrap(), vec![
+            ( 842, 1704, 12 ),
+            ( 843, 1704, 12 ),
+            ( 840, 1705, 12 ),
+            ( 841, 1705, 12 ),
+            ( 842, 1705, 12 ),
+            ( 843, 1705, 12 ),
+            ( 840, 1706, 12 ),
+            ( 843, 1706, 12 ),
+            ( 839, 1707, 12 ),
+            ( 840, 1707, 12 ),
+            ( 843, 1707, 12 ),
+            ( 839, 1708, 12 ),
+            ( 843, 1708, 12 )
+        ])
+    }
+
     #[test]
     fn test_get_parent() {
         assert_eq!(get_parent((5, 10, 10)), (2, 5, 9))
