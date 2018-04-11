@@ -40,13 +40,22 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
             Ok(tiles)
         },
         &geo::Geometry::MultiLineString(ref linestrings) => {
-            Ok(vec!((10, 10, 1)))
+            let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
+
+            for ref linestring in linestrings.0.iter() {
+                line_cover(&mut tiles, linestring, zoom, None);
+            }
+
+            tiles.sort();
+            tiles.dedup();
+
+            Ok(tiles)
         },
         &geo::Geometry::Polygon(ref polygon) => {
-            Ok(vec!((10, 10, 1)))
+            Err(Error::GeomTypeNotSupported)
         },
         &geo::Geometry::MultiPolygon(ref polygons) => {
-            Ok(vec!((10, 10, 1)))
+            Err(Error::GeomTypeNotSupported)
         },
         _ => Err(Error::GeomTypeNotSupported)
     }
