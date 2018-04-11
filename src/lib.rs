@@ -44,6 +44,23 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
     }
 }
 
+pub fn get_children(tile: (i32, i32, u8)) -> Vec<(i32, i32, u8)> {
+    vec![
+        (tile.0 * 2, tile.1 * 2, tile.2 + 1),
+        (tile.0 * 2 + 1, tile.1 * 2, tile.2 + 1),
+        (tile.0 * 2 + 1, tile.1 * 2 + 1, tile.2 + 1),
+        (tile.0 * 2, tile.1 * 2 + 1, tile.2 + 1)
+    ]
+}
+
+pub fn get_parent(tile: (i32, i32, u8)) -> (i32, i32, u8) {
+    (tile.0 >> 1, tile.1 >> 1, tile.2 - 1)    
+}
+
+pub fn get_siblings(tile: (i32, i32, u8)) -> Vec<(i32, i32, u8)> {
+    get_children(get_parent(tile))
+}
+
 /**
  * Get the BBOX of a tile
  *
@@ -131,7 +148,17 @@ mod tests {
         assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 7, 3), (4, 10, 3) ]);
         assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 15, 4), (9, 20, 4) ]);
     }
-    
+  
+    #[test]
+    fn test_get_parent() {
+        assert_eq!(get_parent((5, 10, 10)), (2, 5, 9))
+    }
+
+    #[test]
+    fn test_get_siblings() {
+        assert_eq!(get_siblings((5, 10, 10)), vec![(4, 10, 10), (5, 10, 10), (5, 11, 10), (4, 11, 10)])
+    }
+
     #[test]
     fn test_tile_to_bbox() {
         assert_eq!(tile_to_bbox((5, 10, 10)), (-178.2421875, 84.7060489350415, -177.890625, 84.73838712095339));
