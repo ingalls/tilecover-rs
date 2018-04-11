@@ -10,6 +10,21 @@
 
 ## Version History
 
+## v0.3.0
+
+- :tada: Add tilecover support for `LineString` Geometries
+- :white_check_mark: Add tests for LineString geometries
+
+## v0.2.0
+
+- :tada: `get_siblings`
+- :tada: `get_bbox`
+- :tada: `get_parent`
+- :tada: `get_children`
+- :tada: `tile_to_lat`
+- :tada: `tile_to_lon`
+- :white_check_mark: Add assoc. tests
+
 ## v0.1.1
 
 - :tada: Support tilecover of `Point` and `MultiPoint` geometries
