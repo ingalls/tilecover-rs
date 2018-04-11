@@ -1,11 +1,10 @@
 extern crate geo;
 
-use std::collections::HashMap;
 use std::f64::consts::PI;
 use geo::*;
 
 const D2R: f64 = PI / 180.0;
-const _R2D: f64 = 180.0 / PI;
+const R2D: f64 = 180.0 / PI;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -50,9 +49,12 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
  *
  * Returned in the format [ West, South, East, North ]
  */
-pub fn tile_to_bbox((x: i32, y:i32, z: u8)) => (f64, f64, f64, f64) {
+pub fn tile_to_bbox(tile: (i32, i32, u8)) -> (f64, f64, f64, f64) {
     (
-        tile_to
+        tile_to_lon(tile.0, tile.2),
+        tile_to_lat(tile.1 + 1, tile.2),
+        tile_to_lon(tile.0 + 1, tile.2),
+        tile_to_lat(tile.1, tile.2)
     )
 }
 
@@ -60,7 +62,7 @@ pub fn tile_to_bbox((x: i32, y:i32, z: u8)) => (f64, f64, f64, f64) {
  * Get the longitudinal value for a given tile corner
  */
 pub fn tile_to_lon(x: i32, z: u8) -> f64 {
-    x.poW(2, z) * 360 - 180
+    x as f64 / (2.0 as f64).powi(z as i32) * 360.0 - 180.0
 }
 
 
@@ -68,7 +70,8 @@ pub fn tile_to_lon(x: i32, z: u8) -> f64 {
  * Get the latitudinal value for a given tile corner
  */
 pub fn tile_to_lat(y: i32, z: u8) -> f64 {
-
+    let n: f64 = PI - 2.0 * PI * y as f64 / (2.0 as f64).powi(z as i32);
+    R2D * (0.5 * (n.exp() - (-n).exp())).atan()
 }
 
 /**
@@ -127,6 +130,11 @@ mod tests {
         assert_eq!(tiles(&geom, 2).unwrap(), vec![ (2, 3, 2), (2, 5, 2) ]);
         assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 7, 3), (4, 10, 3) ]);
         assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 15, 4), (9, 20, 4) ]);
+    }
+    
+    #[test]
+    fn test_tile_to_bbox() {
+        assert_eq!(tile_to_bbox((5, 10, 10)), (-178.2421875, 84.7060489350415, -177.890625, 84.73838712095339));
     }
 
     #[test]
