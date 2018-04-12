@@ -8,7 +8,17 @@
 - :arrow_up: when upgrading dependencies
 - :tada: when adding new features
 
+## TODO
+
+- [ ] `MultiLineString` Geom Tests
+- [ ] `Polygon` Geom Support
+- [ ] `MultiPolygon` Geom Support
+
 ## Version History
+
+## v0.4.0
+
+- :tada: Add preliminary support for `MultiLineString` Geometries
 
 ## v0.3.0
 
