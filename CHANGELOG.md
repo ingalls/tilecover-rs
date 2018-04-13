@@ -10,11 +10,14 @@
 
 ## TODO
 
-- [ ] `MultiLineString` Geom Tests
 - [ ] `Polygon` Geom Support
 - [ ] `MultiPolygon` Geom Support
 
 ## Version History
+
+## v0.4.1
+
+- :white_check_mark: Add tests for LineString geometries
 
 ## v0.4.0
 
