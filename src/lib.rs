@@ -52,16 +52,69 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
             Ok(tiles)
         },
         &geo::Geometry::Polygon(ref polygon) => {
-            Err(Error::GeomTypeNotSupported)
+            let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
+
+            poly_cover(&mut tiles, polygon, zoom);
+
+            tiles.sort();
+            tiles.dedup();
+
+            Ok(tiles)
         },
         &geo::Geometry::MultiPolygon(ref polygons) => {
-            Err(Error::GeomTypeNotSupported)
+            let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
+
+            for ref polygon in polygons.0.iter() {
+                poly_cover(&mut tiles, polygon, zoom);
+            }
+
+            tiles.sort();
+            tiles.dedup();
+
+            Ok(tiles)
         },
         _ => Err(Error::GeomTypeNotSupported)
     }
 }
 
-pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, mut ring: Option<Vec<(i32, i32)>>) {
+pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, zoom: u8) {
+    let mut intersections = Vec::new();
+    let mut ring: Vec<(i32, i32)> = Vec::new();
+
+    line_cover(tiles, &polygon.exterior, zoom, Some(&mut ring));
+
+    let mut i = 0;
+    while i < polygon.interiors.len() - 1 {
+    }
+
+    /*
+        for (var j = 0, len = ring.length, k = len - 1; j < len; k = j++) {
+            var m = (j + 1) % len;
+            var y = ring[j][1];
+
+            // add interesction if it's not local extremum or duplicate
+            if ((y > ring[k][1] || y > ring[m][1]) && // not local minimum
+                (y < ring[k][1] || y < ring[m][1]) && // not local maximum
+                y !== ring[m][1]) intersections.push(ring[j]);
+        }
+    }
+
+    intersections.sort(compareTiles); // sort by y, then x
+
+    for (i = 0; i < intersections.length; i += 2) {
+        // fill tiles between pairs of intersections
+        y = intersections[i][1];
+        for (var x = intersections[i][0] + 1; x < intersections[i + 1][0]; x++) {
+            var id = toID(x, y, zoom);
+            if (!tileHash[id]) {
+                tileArray.push([x, y, zoom]);
+            }
+        }
+    }
+    */
+}
+
+pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, ring: Option<&mut Vec<(i32, i32)>>) {
     let mut prev_x: Option<f64> = None;
     let mut prev_y: Option<f64> = None;
 
