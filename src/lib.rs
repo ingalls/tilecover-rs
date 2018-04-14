@@ -108,31 +108,24 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
         }
     }
 
-    /*
-        var m = (j + 1) % len;
-        var y = ring[j][1];
-
-        // add interesction if it's not local extremum or duplicate
-        if ((y > ring[k][1] || y > ring[m][1]) && // not local minimum
-            (y < ring[k][1] || y < ring[m][1]) && // not local maximum
-            y !== ring[m][1]) intersections.push(ring[j]);
-    }
-    */
-
-    /*
+    /* TODO
     intersections.sort(compareTiles); // sort by y, then x
-
-    for (i = 0; i < intersections.length; i += 2) {
-        // fill tiles between pairs of intersections
-        y = intersections[i][1];
-        for (var x = intersections[i][0] + 1; x < intersections[i + 1][0]; x++) {
-            var id = toID(x, y, zoom);
-            if (!tileHash[id]) {
-                tileArray.push([x, y, zoom]);
-            }
-        }
-    }
     */
+
+    let mut int_it = 0;
+    while int_it < intersections.len() {
+        // fill tiles between pairs of intersections
+        let y = intersections[int_it].1;
+
+        let mut x = intersections[int_it].0 + 1;
+        while x < intersections[int_it + 1].0 {
+            tiles.push((x, y, zoom));
+
+            x = x + 1;
+        }
+
+        int_it = int_it + 2;
+    }
 }
 
 pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, mut ring: Option<&mut Vec<(i32, i32)>>) {
