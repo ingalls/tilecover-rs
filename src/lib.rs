@@ -78,27 +78,48 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 }
 
 pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, zoom: u8) {
-    let mut intersections = Vec::new();
+    let mut intersections: Vec<(i32, i32)> = Vec::new();
     let mut ring: Vec<(i32, i32)> = Vec::new();
 
-    line_cover(tiles, &polygon.exterior, zoom, Some(&mut ring));
+    poly_cover_single(&mut intersections, tiles, &polygon.exterior, zoom);
 
-    let mut i = 0;
-    while i < polygon.interiors.len() - 1 {
-    }
+}
 
-    /*
-        for (var j = 0, len = ring.length, k = len - 1; j < len; k = j++) {
-            var m = (j + 1) % len;
-            var y = ring[j][1];
+fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8) {
+    let mut ring: Vec<(i32, i32)> = Vec::new();
 
-            // add interesction if it's not local extremum or duplicate
-            if ((y > ring[k][1] || y > ring[m][1]) && // not local minimum
-                (y < ring[k][1] || y < ring[m][1]) && // not local maximum
-                y !== ring[m][1]) intersections.push(ring[j]);
+    line_cover(tiles, &linestring, zoom, Some(&mut ring));
+
+    let mut j = 0;
+    let len = ring.len();
+    let mut k = len - 1;
+
+    while j < len {
+        j = j + 1;
+        k = j;
+
+        let m = (j + 1) % len;
+        let y = ring[j].1;
+
+        //Add Intersection if it's not local extrenum or Duplicate
+        //      Not Local Mim                               Not Local Max
+        if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
+            intersections.push(ring[j]);
         }
     }
 
+    /*
+        var m = (j + 1) % len;
+        var y = ring[j][1];
+
+        // add interesction if it's not local extremum or duplicate
+        if ((y > ring[k][1] || y > ring[m][1]) && // not local minimum
+            (y < ring[k][1] || y < ring[m][1]) && // not local maximum
+            y !== ring[m][1]) intersections.push(ring[j]);
+    }
+    */
+
+    /*
     intersections.sort(compareTiles); // sort by y, then x
 
     for (i = 0; i < intersections.length; i += 2) {
@@ -114,7 +135,7 @@ pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, 
     */
 }
 
-pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, ring: Option<&mut Vec<(i32, i32)>>) {
+pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8, mut ring: Option<&mut Vec<(i32, i32)>>) {
     let mut prev_x: Option<f64> = None;
     let mut prev_y: Option<f64> = None;
 
@@ -409,31 +430,31 @@ mod tests {
 
         let geom = line.into();
         assert_eq!(tiles(&geom, 8).unwrap(), vec![
-            ( 128, 87, 8 ),                                                                                            
-            ( 129, 86, 8 ),                                                                                            
-            ( 129, 87, 8 ),                                                                                            
-            ( 130, 86, 8 ),                                                                                            
-            ( 130, 87, 8 ),                                                                                     
-            ( 130, 88, 8 ),                                                                                           
-            ( 131, 87, 8 ),                                                                              
-            ( 131, 88, 8 ),                                                                                            
-            ( 131, 90, 8 ),                                                                                            
-            ( 132, 88, 8 ),                                                                                     
-            ( 132, 89, 8 ),                                                                            
-            ( 132, 90, 8 ),          
-            ( 133, 86, 8 ),                                                                                            
-            ( 133, 88, 8 ),                                                                              
-            ( 133, 89, 8 ),                                                                                       
-            ( 134, 86, 8 ),                                                                                            
-            ( 134, 87, 8 ),                                                                                            
-            ( 134, 88, 8 ),                                                                   
-            ( 135, 85, 8 ),                                                                                            
-            ( 135, 86, 8 ),                                                                                            
-            ( 135, 87, 8 ),                                                                                       
-            ( 135, 88, 8 ),                                                                                       
-            ( 135, 89, 8 ),                                                                                     
-            ( 136, 85, 8 ),                                                                                            
-            ( 136, 89, 8 ),                          
+            ( 128, 87, 8 ),
+            ( 129, 86, 8 ),
+            ( 129, 87, 8 ),
+            ( 130, 86, 8 ),
+            ( 130, 87, 8 ),
+            ( 130, 88, 8 ),
+            ( 131, 87, 8 ),
+            ( 131, 88, 8 ),
+            ( 131, 90, 8 ),
+            ( 132, 88, 8 ),
+            ( 132, 89, 8 ),
+            ( 132, 90, 8 ),
+            ( 133, 86, 8 ),
+            ( 133, 88, 8 ),
+            ( 133, 89, 8 ),
+            ( 134, 86, 8 ),
+            ( 134, 87, 8 ),
+            ( 134, 88, 8 ),
+            ( 135, 85, 8 ),
+            ( 135, 86, 8 ),
+            ( 135, 87, 8 ),
+            ( 135, 88, 8 ),
+            ( 135, 89, 8 ),
+            ( 136, 85, 8 ),
+            ( 136, 89, 8 ),
             ( 136, 90, 8 )
         ]);
     }
