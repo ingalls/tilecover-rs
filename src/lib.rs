@@ -83,6 +83,10 @@ pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, 
 
     poly_cover_single(&mut intersections, tiles, &polygon.exterior, zoom);
 
+    for interior in &polygon.interiors {
+        poly_cover_single(&mut intersections, tiles, &interior, zoom);
+    }
+
 }
 
 fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8) {
