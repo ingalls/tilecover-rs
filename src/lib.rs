@@ -94,22 +94,24 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
 
     line_cover(tiles, &linestring, zoom, Some(&mut ring));
 
-    let mut j = 0;
-    let len = ring.len();
-    let mut k = len - 1;
+    if ring.len() > 0 {
+        let mut j = 0;
+        let len = ring.len();
+        let mut k = len - 1;
 
-    while j < len {
-        let m = (j + 1) % len;
-        let y = ring[j].1;
+        while j < len {
+            let m = (j + 1) % len;
+            let y = ring[j].1;
 
-        //Add Intersection if it's not local extrenum or Duplicate
-        //      Not Local Mim                               Not Local Max
-        if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
-            intersections.push(ring[j]);
+            //Add Intersection if it's not local extrenum or Duplicate
+            //      Not Local Mim                               Not Local Max
+            if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
+                intersections.push(ring[j]);
+            }
+
+            j = j + 1;
+            k = j;
         }
-
-        j = j + 1;
-        k = j;
     }
     
     // sort by y, then x
@@ -227,7 +229,7 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
         if ring != None {
             match ring {
                 Some(ref mut r) => {
-                    if y as i32 == r[0].1 {
+                    if r.len() > 0 && y as i32 == r[0].1 {
                         r.pop();
                     }
                 },
@@ -511,10 +513,10 @@ mod tests {
 
         let geom = poly.into();
         assert_eq!(tiles(&geom, 18).unwrap(), vec![
-             ( 131, 112, 18 ),
-             ( 131, 113, 18 )
+            ( 74890, 100305, 18 ),
+            ( 74891, 100305, 18 ),
+            ( 74891, 100306, 18 )                           
         ]);
-
     }
 
     #[test]
