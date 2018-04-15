@@ -483,7 +483,8 @@ mod tests {
 
         let geom = poly.into();
         assert_eq!(tiles(&geom, 8).unwrap(), vec![
-            ( 128, 87, 8 )
+             ( 131, 112, 8 ),
+             ( 131, 113, 8 )
         ]);
 
     }
