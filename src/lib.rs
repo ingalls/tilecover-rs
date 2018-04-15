@@ -80,7 +80,6 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 
 pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, zoom: u8) {
     let mut intersections: Vec<(i32, i32)> = Vec::new();
-    let mut ring: Vec<(i32, i32)> = Vec::new();
 
     poly_cover_single(&mut intersections, tiles, &polygon.exterior, zoom);
 
@@ -100,9 +99,6 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
     let mut k = len - 1;
 
     while j < len {
-        j = j + 1;
-        k = j;
-
         let m = (j + 1) % len;
         let y = ring[j].1;
 
@@ -111,6 +107,9 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
         if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
             intersections.push(ring[j]);
         }
+
+        j = j + 1;
+        k = j;
     }
     
     // sort by y, then x
@@ -467,6 +466,26 @@ mod tests {
             ( 136, 89, 8 ),
             ( 136, 90, 8 )
         ]);
+    }
+
+    #[test]
+    fn test_polygon() {
+        let poly = Polygon::new(
+            LineString(vec![
+                Point::new(5.11962890625, 20.46818922264095),
+                Point::new(5.11962890625, 20.7663868125152),
+                Point::new(5.504150390625, 20.7663868125152),
+                Point::new(5.504150390625, 20.46818922264095),
+                Point::new(5.11962890625, 20.46818922264095),
+            ]),
+            Vec::<LineString<f64>>::new()
+        );
+
+        let geom = poly.into();
+        assert_eq!(tiles(&geom, 8).unwrap(), vec![
+            ( 128, 87, 8 )
+        ]);
+
     }
 
     #[test]
