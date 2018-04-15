@@ -2,6 +2,7 @@ extern crate geo;
 
 use std::f64::consts::PI;
 use std::f64::INFINITY as INF;
+use std::cmp::Ordering;
 use geo::*;
 
 const D2R: f64 = PI / 180.0;
@@ -111,10 +112,22 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
             intersections.push(ring[j]);
         }
     }
-
-    /* TODO
-    intersections.sort(compareTiles); // sort by y, then x
-    */
+    
+    // sort by y, then x
+    intersections.sort_by(|a,b| {
+        //Sort by y first
+        if a.1 > b.1 {
+            return Ordering::Greater;
+        } else if a.1 < b.1 {
+            return Ordering::Less;
+        } else if a.0 > b.0 {
+            return Ordering::Greater;
+        } else if a.0 < b.0 {
+            return Ordering::Less;
+        } else {
+            return Ordering::Equal
+        }
+    });
 
     let mut int_it = 0;
     while int_it < intersections.len() {
