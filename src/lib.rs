@@ -113,7 +113,7 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
             k = j;
         }
     }
-    
+
     // sort by y, then x
     intersections.sort_by(|a,b| {
         //Sort by y first
@@ -515,7 +515,58 @@ mod tests {
         assert_eq!(tiles(&geom, 18).unwrap(), vec![
             ( 74890, 100305, 18 ),
             ( 74891, 100305, 18 ),
-            ( 74891, 100306, 18 )                           
+            ( 74891, 100306, 18 )
+        ]);
+    }
+
+    #[test]
+    fn test_polygon_donut() {
+        let poly = Polygon::new(
+            LineString(vec![
+                Point::new(-76.165286,45.479514),
+                Point::new(-76.140095,45.457437),
+                Point::new(-76.162348,45.444872),
+                Point::new(-76.168656,45.441087),
+                Point::new(-76.201963,45.420225),
+                Point::new(-76.213668,45.429276),
+                Point::new(-76.214261,45.429917),
+                Point::new(-76.227477,45.440383),
+                Point::new(-76.263056,45.467983),
+                Point::new(-76.245084,45.468609),
+                Point::new(-76.240206,45.471202),
+                Point::new(-76.238518,45.475254),
+                Point::new(-76.233483,45.507829),
+                Point::new(-76.227816,45.511836),
+                Point::new(-76.212117,45.51623),
+                Point::new(-76.191776,45.50154),
+                Point::new(-76.174016,45.486911),
+                Point::new(-76.165286,45.479514)
+            ]),
+            vec![LineString(vec![
+                Point::new(-76.227618, 45.489247),
+                Point::new(-76.232113, 45.486983),
+                Point::new(-76.232151, 45.486379),
+                Point::new(-76.231812, 45.485106),
+                Point::new(-76.230698, 45.483236),
+                Point::new(-76.225664, 45.477365),
+                Point::new(-76.223568, 45.475174),
+                Point::new(-76.202829, 45.458815),
+                Point::new(-76.200229, 45.458822),
+                Point::new(-76.199069, 45.459164),
+                Point::new(-76.188361, 45.465784),
+                Point::new(-76.204505, 45.479018),
+                Point::new(-76.215555, 45.488534),
+                Point::new(-76.220249, 45.492175),
+                Point::new(-76.221154, 45.493315),
+                Point::new(-76.22631, 45.490189),
+                Point::new(-76.226543, 45.489754),
+                Point::new(-76.227618, 45.489247)
+            ])]
+        );
+
+        let geom = poly.into();
+        assert_eq!(tiles(&geom, 16).unwrap(), vec![
+            
         ]);
     }
 
