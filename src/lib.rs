@@ -149,6 +149,8 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
     let mut prev_x: Option<f64> = None;
     let mut prev_y: Option<f64> = None;
 
+    println!("{}", linestring);
+
     let mut i = 0;
     while i < linestring.0.len() - 1 {
         let start = point_to_tile_fraction(linestring.0[i].x(), linestring.0[i].y(), zoom);
