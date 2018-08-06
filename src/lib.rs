@@ -87,33 +87,6 @@ pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, 
         poly_cover_single(&mut intersections, tiles, &interior, zoom);
     }
 
-}
-
-fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8) {
-    let mut ring: Vec<(i32, i32)> = Vec::new();
-
-    line_cover(tiles, &linestring, zoom, Some(&mut ring));
-
-    if ring.len() > 0 {
-        let mut j = 0;
-        let len = ring.len();
-        let mut k = len - 1;
-
-        while j < len {
-            let m = (j + 1) % len;
-            let y = ring[j].1;
-
-            //Add Intersection if it's not local extrenum or Duplicate
-            //      Not Local Mim                               Not Local Max
-            if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
-                intersections.push(ring[j]);
-            }
-
-            j = j + 1;
-            k = j;
-        }
-    }
-
     // sort by y, then x
     intersections.sort_by(|a,b| {
         //Sort by y first
@@ -143,6 +116,32 @@ fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, 
         }
 
         int_it = int_it + 2;
+    }
+}
+
+fn poly_cover_single(intersections: &mut Vec<(i32, i32)>, tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<f64>, zoom: u8) {
+    let mut ring: Vec<(i32, i32)> = Vec::new();
+
+    line_cover(tiles, &linestring, zoom, Some(&mut ring));
+
+    if ring.len() > 0 {
+        let mut j = 0;
+        let len = ring.len();
+        let mut k = len - 1;
+
+        while j < len {
+            let m = (j + 1) % len;
+            let y = ring[j].1;
+
+            //Add Intersection if it's not local extrenum or Duplicate
+            //      Not Local Mim                               Not Local Max
+            if (y > ring[k].1 || y > ring[m].1) && (y < ring[k].1 || y < ring[m].1) && y != ring[m].1 {
+                intersections.push(ring[j]);
+            }
+
+            j = j + 1;
+            k = j;
+        }
     }
 }
 
