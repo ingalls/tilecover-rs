@@ -10,10 +10,11 @@
 
 ## TODO
 
-- [ ] `Polygon` Geom Support
-- [ ] `MultiPolygon` Geom Support
-
 ## Version History
+
+## v1.0.0
+
+- :tada: Add support for `Polygon` and `MultiPolygon` types
 
 ## v0.4.1
 
