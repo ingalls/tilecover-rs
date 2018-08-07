@@ -3,8 +3,8 @@
 <p align=center>Generate the minimum number of tiles to cover a Geometry.</p>
 
 <p align="center">
-  <a href="https://circleci.com/gh/ingalls/tilecover/tree/master"><img src="https://circleci.com/gh/ingalls/tilecover/tree/master.svg?style=shield"/></a>
-  <a href="https://crates.io/crates/tilecover"><img src="https://img.shields.io/crates/v/tilecover.svg"/></a>
+  <a href="https://circleci.com/gh/ingalls/tilecover-rs/tree/master"><img src="https://circleci.com/gh/ingalls/tilecover-rs/tree/master.svg?style=shield"/></a>
+  <a href="https://crates.io/crates/tilecover-rs"><img src="https://img.shields.io/crates/v/tilecover-rs.svg"/></a>
 </p>
 
 <p align=center>

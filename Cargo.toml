@@ -1,11 +1,11 @@
 [package]
 name = "tilecover"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["ingalls <ingalls@protonmail.com>"]
 description = "Generate the minimum number of tiles to cover a geometry"
 
-homepage = "https://github.com/ingalls/tilecover"
-repository = "https://github.com/ingalls/tilecover"
+homepage = "https://github.com/ingalls/tilecover-rs"
+repository = "https://github.com/ingalls/tilecover-rs"
 
 readme = "README.md"
 
