@@ -13,4 +13,4 @@ categories = ["algorithms"]
 license = "MIT"
 
 [dependencies]
-geo = "0.7.4"
+geo = "0.9.1"
