@@ -350,7 +350,7 @@ mod tests {
     fn test_line() {
         let line = LineString(vec![
             Coordinate {
-                x: 106.21719360351562,
+                x: -106.21719360351562,
                 y: 28.592359801121567
             },
             Coordinate {
