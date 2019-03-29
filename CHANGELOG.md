@@ -12,6 +12,10 @@
 
 ## Version History
 
+## v1.1.0
+
+- :arrow_up: Update to `geo@0.12`
+
 ## v1.0.0
 
 - :tada: Add support for `Polygon` and `MultiPolygon` types
