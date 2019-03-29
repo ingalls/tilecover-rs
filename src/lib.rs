@@ -81,9 +81,9 @@ pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Erro
 pub fn poly_cover(tiles: &mut Vec<(i32, i32, u8)>, polygon: &geo::Polygon<f64>, zoom: u8) {
     let mut intersections: Vec<(i32, i32)> = Vec::new();
 
-    poly_cover_single(&mut intersections, tiles, &polygon.exterior, zoom);
+    poly_cover_single(&mut intersections, tiles, &polygon.exterior(), zoom);
 
-    for interior in &polygon.interiors {
+    for interior in polygon.interiors() {
         poly_cover_single(&mut intersections, tiles, &interior, zoom);
     }
 
@@ -153,8 +153,8 @@ pub fn line_cover(tiles: &mut Vec<(i32, i32, u8)>, linestring: &geo::LineString<
 
     let mut i = 0;
     while i < linestring.0.len() - 1 {
-        let start = point_to_tile_fraction(linestring.0[i].x(), linestring.0[i].y(), zoom);
-        let stop = point_to_tile_fraction(linestring.0[i + 1].x(), linestring.0[i + 1].y(), zoom);
+        let start = point_to_tile_fraction(linestring.0[i].x, linestring.0[i].y, zoom);
+        let stop = point_to_tile_fraction(linestring.0[i + 1].x, linestring.0[i + 1].y, zoom);
 
         let x0 = start.0;
         let y0 = start.1;
@@ -349,10 +349,22 @@ mod tests {
     #[test]
     fn test_line() {
         let line = LineString(vec![
-            Point::new(-106.21719360351562, 28.592359801121567),
-            Point::new(-106.1004638671875, 28.791130513231813),
-            Point::new(-105.87661743164062, 28.864519767126602),
-            Point::new(-105.82374572753905, 28.60743139267596)
+            Coordinate {
+                x: -106.21719360351562,
+                y: 28.592359801121567
+            },
+            Coordinate {
+                x: -106.1004638671875,
+                y: 28.791130513231813
+            },
+            Coordinate {
+                x: -105.87661743164062,
+                y: 28.864519767126602
+            },
+            Coordinate {
+                x: -105.82374572753905,
+                y: 28.60743139267596
+            }
         ]);
 
         let geom = line.into();
@@ -376,40 +388,142 @@ mod tests {
     #[test]
     fn test_edge_line() {
         let line = LineString(vec![
-            Point::new(-80.160384, 32.766901),
-            Point::new(-80.160216, 32.766845),
-            Point::new(-80.159659, 32.766722),
-            Point::new(-80.159356, 32.766633),
-            Point::new(-80.159196, 32.766586),
-            Point::new(-80.159096, 32.766571),
-            Point::new(-80.159016, 32.766569),
-            Point::new(-80.158947, 32.766581),
-            Point::new(-80.158637, 32.766668),
-            Point::new(-80.158527, 32.766691),
-            Point::new(-80.158433, 32.766697),
-            Point::new(-80.158367, 32.76669),
-            Point::new(-80.158116, 32.766641),
-            Point::new(-80.157565, 32.766507),
-            Point::new(-80.157183, 32.766389),
-            Point::new(-80.156946, 32.76633),
-            Point::new(-80.156748, 32.766298),
-            Point::new(-80.156657, 32.766279),
-            Point::new(-80.156492, 32.766253),
-            Point::new(-80.15626, 32.766181),
-            Point::new(-80.156216, 32.766155),
-            Point::new(-80.156166, 32.766118),
-            Point::new(-80.156148, 32.7661),
-            Point::new(-80.156125, 32.766052),
-            Point::new(-80.156122, 32.766012),
-            Point::new(-80.156131, 32.765974),
-            Point::new(-80.156179, 32.765905),
-            Point::new(-80.156198, 32.765856),
-            Point::new(-80.15621, 32.765807),
-            Point::new(-80.15625, 32.76548),
-            Point::new(-80.156249, 32.765323),
-            Point::new(-80.156235, 32.765284),
-            Point::new(-80.156215, 32.765256),
-            Point::new(-80.156181, 32.765226)
+            Coordinate {
+                x: -80.160384,
+                y: 32.766901
+            },
+            Coordinate {
+                x: -80.160216,
+                y:32.766845
+            },
+            Coordinate {
+                x: -80.159659,
+                y: 32.766722
+            },
+            Coordinate {
+                x: -80.159356,
+                y: 32.766633
+            },
+            Coordinate {
+                x: -80.159196,
+                y: 32.766586
+            },
+            Coordinate {
+                x: -80.159096,
+                y: 32.766571
+            },
+            Coordinate {
+                x: -80.159016,
+                y: 32.766569
+            },
+            Coordinate {
+                x: -80.158947,
+                y: 32.766581
+            },
+            Coordinate {
+                x: -80.158637,
+                y: 32.766668
+            },
+            Coordinate {
+                x: -80.158527,
+                y: 32.766691
+            },
+            Coordinate {
+                x: -80.158433,
+                y: 32.766697
+            },
+            Coordinate {
+                x: -80.158367,
+                y: 32.76669
+            },
+            Coordinate {
+                x: -80.158116,
+                y: 32.766641
+            },
+            Coordinate {
+                x: -80.157565,
+                y: 32.766507
+            },
+            Coordinate {
+                x: -80.157183,
+                y: 32.766389
+            },
+            Coordinate {
+                x: -80.156946,
+                y: 32.76633
+            },
+            Coordinate {
+                x: -80.156748,
+                y: 32.766298
+            },
+            Coordinate {
+                x: -80.156657,
+                y: 32.766279
+            },
+            Coordinate {
+                x: -80.156492,
+                y: 32.766253
+            },
+            Coordinate { 
+                x: -80.15626,
+                y: 32.766181
+            },
+            Coordinate {
+                x: -80.156216,
+                y: 32.766155
+            },
+            Coordinate {
+                x: -80.156166,
+                y: 32.766118
+            },
+            Coordinate {
+                x: -80.156148,
+                y: 32.7661
+            },
+            Coordinate {
+                x: -80.156125,
+                y: 32.766052
+            },
+            Coordinate {
+                x: -80.156122,
+                y: 32.766012
+            },
+            Coordinate {
+                x: -80.156131,
+                y: 32.765974
+            },
+            Coordinate {
+                x: -80.156179,
+                y: 32.765905
+            },
+            Coordinate {
+                x: -80.156198,
+                y: 32.765856
+            },
+            Coordinate {
+                x: -80.15621,
+                y: 32.765807
+            },
+            Coordinate {
+                x: -80.15625,
+                y: 32.76548
+            },
+            Coordinate {
+                x: -80.156249,
+                y: 32.765323
+            },
+            Coordinate {
+                x: -80.156235,
+                y: 32.765284
+            },
+            Coordinate {
+                x: -80.156215,
+                y: 32.765256
+            },
+            Coordinate {
+                x: -80.156181,
+                y: 32.765226
+            },
         ]);
 
         let geom = line.into();
@@ -423,19 +537,52 @@ mod tests {
     fn test_multiline() {
         let line = MultiLineString(vec![
             LineString(vec![
-                Point::new(11.3818359375, 51.15178610143037),
-                Point::new(7.998046875, 50.0077390146369),
-                Point::new(10.458984375, 49.18170338770663),
-                Point::new(5.2734375, 46.6795944656402),
+                Coordinate {
+                    x: 11.3818359375,
+                    y: 51.15178610143037
+                },
+                Coordinate {
+                    x: 7.998046875,
+                    y: 50.0077390146369
+                },
+                Coordinate {
+                    x: 10.458984375,
+                    y: 49.18170338770663
+                },
+                Coordinate {
+                    x: 5.2734375,
+                    y: 46.6795944656402
+                }
             ]),
             LineString(vec![
-                Point::new(0.263671875, 49.15296965617042),
-                Point::new(3.076171875, 50.0077390146369),
-                Point::new(3.6474609374999996, 48.60385760823255),
-                Point::new(4.7900390625, 49.095452162534826),
-                Point::new(6.328125, 48.48748647988415),
-                Point::new(10.1513671875, 48.07807894349862),
-                Point::new(12.392578125, 46.46813299215554),
+                Coordinate {
+                    x: 0.263671875,
+                    y: 49.15296965617042
+                },
+                Coordinate {
+                    x: 3.076171875,
+                    y: 50.0077390146369
+                },
+                Coordinate {
+                    x: 3.6474609374999996,
+                    y: 48.60385760823255
+                },
+                Coordinate {
+                    x: 4.7900390625,
+                    y: 49.095452162534826
+                },
+                Coordinate {
+                    x: 6.328125,
+                    y: 48.48748647988415
+                },
+                Coordinate {
+                    x: 10.1513671875,
+                    y: 48.07807894349862
+                },
+                Coordinate {
+                    x: 12.392578125,
+                    y: 46.46813299215554
+                }
             ])
         ]);
 
@@ -474,11 +621,26 @@ mod tests {
     fn test_polygon() {
         let poly = Polygon::new(
             LineString(vec![
-                Point::new(5.11962890625, 20.46818922264095),
-                Point::new(5.11962890625, 20.7663868125152),
-                Point::new(5.504150390625, 20.7663868125152),
-                Point::new(5.504150390625, 20.46818922264095),
-                Point::new(5.11962890625, 20.46818922264095),
+                Coordinate {
+                    x: 5.11962890625,
+                    y: 20.46818922264095
+                },
+                Coordinate {
+                    x: 5.11962890625,
+                    y: 20.7663868125152
+                },
+                Coordinate {
+                    x: 5.504150390625,
+                    y: 20.7663868125152
+                },
+                Coordinate {
+                    x: 5.504150390625,
+                    y: 20.46818922264095
+                },
+                Coordinate {
+                    x: 5.11962890625,
+                    y: 20.46818922264095
+                }
             ]),
             Vec::<LineString<f64>>::new()
         );
@@ -494,19 +656,58 @@ mod tests {
     fn test_polygon_building() {
         let poly = Polygon::new(
             LineString(vec![
-                Point::new(-77.15269088745116,38.87153962460514),
-                Point::new(-77.1521383523941,38.871322446566325),
-                Point::new(-77.15196132659912,38.87159391901113),
-                Point::new(-77.15202569961546,38.87162315444336),
-                Point::new(-77.1519023180008,38.87179021382536),
-                Point::new(-77.15266406536102,38.8727758561868),
-                Point::new(-77.1527713537216,38.87274662122871),
-                Point::new(-77.15282499790192,38.87282179681094),
-                Point::new(-77.15323269367218,38.87267562199469),
-                Point::new(-77.15313613414764,38.87254197618533),
-                Point::new(-77.15270698070526,38.87236656567917),
-                Point::new(-77.1523904800415,38.87198233162923),
-                Point::new(-77.15269088745116,38.87153962460514),
+                Coordinate {
+                    x: -77.15269088745116,
+                    y: 38.87153962460514
+                },
+                Coordinate {
+                    x: -77.1521383523941,
+                    y: 38.871322446566325
+                },
+                Coordinate {
+                    x: -77.15196132659912,
+                    y: 38.87159391901113
+                },
+                Coordinate {
+                    x: -77.15202569961546,
+                    y: 38.87162315444336
+                },
+                Coordinate {
+                    x: -77.1519023180008,
+                    y: 38.87179021382536
+                },
+                Coordinate {
+                    x: -77.15266406536102,
+                    y: 38.8727758561868
+                },
+                Coordinate {
+                    x: -77.1527713537216,
+                    y: 38.87274662122871
+                },
+                Coordinate {
+                    x: -77.15282499790192,
+                    y: 38.87282179681094
+                },
+                Coordinate {
+                    x: -77.15323269367218,
+                    y: 38.87267562199469
+                },
+                Coordinate {
+                    x: -77.15313613414764,
+                    y: 38.87254197618533
+                },
+                Coordinate {
+                    x: -77.15270698070526,
+                    y: 38.87236656567917
+                },
+                Coordinate {
+                    x: -77.1523904800415,
+                    y: 38.87198233162923
+                },
+                Coordinate {
+                    x: -77.15269088745116,
+                    y: 38.87153962460514
+                }
             ]),
             Vec::<LineString<f64>>::new()
         );
@@ -523,44 +724,152 @@ mod tests {
     fn test_polygon_donut() {
         let poly = Polygon::new(
             LineString(vec![
-                Point::new(-76.165286,45.479514),
-                Point::new(-76.140095,45.457437),
-                Point::new(-76.162348,45.444872),
-                Point::new(-76.168656,45.441087),
-                Point::new(-76.201963,45.420225),
-                Point::new(-76.213668,45.429276),
-                Point::new(-76.214261,45.429917),
-                Point::new(-76.227477,45.440383),
-                Point::new(-76.263056,45.467983),
-                Point::new(-76.245084,45.468609),
-                Point::new(-76.240206,45.471202),
-                Point::new(-76.238518,45.475254),
-                Point::new(-76.233483,45.507829),
-                Point::new(-76.227816,45.511836),
-                Point::new(-76.212117,45.51623),
-                Point::new(-76.191776,45.50154),
-                Point::new(-76.174016,45.486911),
-                Point::new(-76.165286,45.479514)
+               Coordinate {
+                   x: -76.165286,
+                   y: 45.479514
+               },
+               Coordinate {
+                   x: -76.140095,
+                   y: 45.457437
+               },
+               Coordinate {
+                   x: -76.162348,
+                   y: 45.444872
+               },
+               Coordinate {
+                   x: -76.168656,
+                   y: 45.441087
+               },
+               Coordinate {
+                   x: -76.201963,
+                   y: 45.420225
+               },
+               Coordinate {
+                   x: -76.213668,
+                   y: 45.429276
+               },
+               Coordinate {
+                   x: -76.214261,
+                   y: 45.429917
+               },
+               Coordinate {
+                   x: -76.227477,
+                   y: 45.440383
+               },
+               Coordinate {
+                   x: -76.263056,
+                   y: 45.467983
+               },
+               Coordinate {
+                   x: -76.245084,
+                   y: 45.468609
+               },
+               Coordinate {
+                   x: -76.240206,
+                   y: 45.471202
+               },
+               Coordinate {
+                   x: -76.238518,
+                   y: 45.475254
+               },
+               Coordinate {
+                   x: -76.233483,
+                   y: 45.507829
+               },
+               Coordinate {
+                   x: -76.227816,
+                   y: 45.511836
+               },
+               Coordinate {
+                   x: -76.212117,
+                   y: 45.51623
+               },
+               Coordinate {
+                   x: -76.191776,
+                   y: 45.50154
+               },
+               Coordinate {
+                   x: -76.174016,
+                   y: 45.486911
+               },
+               Coordinate {
+                   x: -76.165286,
+                   y: 45.479514
+               }
             ]),
             vec![LineString(vec![
-                Point::new(-76.227618, 45.489247),
-                Point::new(-76.232113, 45.486983),
-                Point::new(-76.232151, 45.486379),
-                Point::new(-76.231812, 45.485106),
-                Point::new(-76.230698, 45.483236),
-                Point::new(-76.225664, 45.477365),
-                Point::new(-76.223568, 45.475174),
-                Point::new(-76.202829, 45.458815),
-                Point::new(-76.200229, 45.458822),
-                Point::new(-76.199069, 45.459164),
-                Point::new(-76.188361, 45.465784),
-                Point::new(-76.204505, 45.479018),
-                Point::new(-76.215555, 45.488534),
-                Point::new(-76.220249, 45.492175),
-                Point::new(-76.221154, 45.493315),
-                Point::new(-76.22631, 45.490189),
-                Point::new(-76.226543, 45.489754),
-                Point::new(-76.227618, 45.489247)
+                Coordinate {
+                    x: -76.227618,
+                    y: 45.489247
+                },
+                Coordinate {
+                    x: -76.232113,
+                    y: 45.486983
+                },
+                Coordinate {
+                    x: -76.232151,
+                    y: 45.486379
+                },
+                Coordinate {
+                    x: -76.231812,
+                    y: 45.485106
+                },
+                Coordinate {
+                    x: -76.230698,
+                    y: 45.483236
+                },
+                Coordinate {
+                    x: -76.225664,
+                    y: 45.477365
+                },
+                Coordinate {
+                    x: -76.223568,
+                    y: 45.475174
+                },
+                Coordinate {
+                    x: -76.202829,
+                    y: 45.458815
+                },
+                Coordinate {
+                    x: -76.200229,
+                    y: 45.458822
+                },
+                Coordinate {
+                    x: -76.199069,
+                    y: 45.459164
+                },
+                Coordinate {
+                    x: -76.188361,
+                    y: 45.465784
+                },
+                Coordinate {
+                    x: -76.204505,
+                    y: 45.479018
+                },
+                Coordinate {
+                    x: -76.215555,
+                    y: 45.488534
+                },
+                Coordinate {
+                    x: -76.220249,
+                    y: 45.492175
+                },
+                Coordinate {
+                    x: -76.221154,
+                    y: 45.493315
+                },
+                Coordinate {
+                    x: -76.22631,
+                    y: 45.490189
+                },
+                Coordinate {
+                    x: -76.226543,
+                    y: 45.489754
+                },
+                Coordinate {
+                    x: -76.227618,
+                    y: 45.489247
+                }
             ])]
         );
 
