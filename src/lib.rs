@@ -16,13 +16,13 @@ pub enum Error {
 pub fn tiles(geom: &Geometry<f64>, zoom: u8) -> Result<Vec<(i32, i32, u8)>, Error> {
     match geom {
         &geo::Geometry::Point(ref point) => {
-            Ok(vec!(point_to_tile(point.lat(), point.lng(), zoom)))
+            Ok(vec!(point_to_tile(point.lng(), point.lat(), zoom)))
         },
         &geo::Geometry::MultiPoint(ref points) => {
             let mut tiles: Vec<(i32, i32, u8)> = Vec::new();
 
             for point in points.clone() {
-                let tile = point_to_tile(point.lat(), point.lng(), zoom);
+                let tile = point_to_tile(point.lng(), point.lat(), zoom);
                 if !tiles.contains(&tile) {
                     tiles.push(tile)
                 }
@@ -325,10 +325,14 @@ mod tests {
     fn test_point() {
         let point = Point::new(-77.15664982795715, 38.87419791355846);
         let geom = point.into();
-        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (1, 1, 1) ]);
-        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (2, 3, 2) ]);
-        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 6, 3) ]);
-        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 13, 4) ]);
+        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (0, 0, 1) ]);
+        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (1, 1, 2) ]);
+        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (2, 3, 3) ]);
+        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (4, 6, 4) ]);
+
+        let point = Point::new(-79.37969952821732, 38.8328422301817);
+        let geom = point.into();
+        assert_eq!(tiles(&geom, 14).unwrap(), vec![ (4579, 6271, 14) ]);
     }
 
     #[test]
@@ -340,10 +344,17 @@ mod tests {
             ( -90.8349609375, 39.93711893299021 )
         ].into();
         let geom = points.into();
-        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (1, 1, 1), (1, 2, 1) ]);
-        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (2, 3, 2), (2, 5, 2) ]);
-        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (4, 7, 3), (4, 10, 3) ]);
-        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (9, 15, 4), (9, 20, 4) ]);
+        assert_eq!(tiles(&geom, 1).unwrap(), vec![ (0, 0, 1) ]);
+        assert_eq!(tiles(&geom, 2).unwrap(), vec![ (1, 1, 2), (0, 1, 2) ]);
+        assert_eq!(tiles(&geom, 3).unwrap(), vec![ (2, 2, 3), (1, 3, 3) ]);
+        assert_eq!(tiles(&geom, 4).unwrap(), vec![ (4, 5, 4), (3, 6, 4) ]);
+
+        let points: MultiPoint<f64> = vec![
+            (-79.37969952821732, 38.8328422301817)
+        ].into();
+
+        let geom = points.into();
+        assert_eq!(tiles(&geom, 14).unwrap(), vec![ (4579, 6271, 14) ]);
     }
 
     #[test]
