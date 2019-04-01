@@ -386,6 +386,33 @@ mod tests {
     }
 
     #[test]
+    fn test_line_2() {
+        let line = LineString(vec![
+            Coordinate {
+                x: -79.37619924545288,
+                y: 38.8345346107744
+            },
+            Coordinate {
+                x: -79.37287330627441,
+                y: 38.83762675779815
+            },
+            Coordinate {
+                x: -79.37230467796326,
+                y: 38.83820338656929
+            },
+            Coordinate {
+                x: -79.37211155891418,
+                y: 38.83878001066818
+            }
+        ]);
+
+        let geom = line.into();
+        assert_eq!(tiles(&geom, 14).unwrap(), vec![
+            ( 4579, 6271, 14 ),
+        ])
+    }
+
+    #[test]
     fn test_edge_line() {
         let line = LineString(vec![
             Coordinate {
