@@ -12,6 +12,10 @@
 
 ## Version History
 
+## v1.1.1
+
+- Version bump
+
 ## v1.1.0
 
 - :bug: Fix `Point` & `MultiPoint` miscalc
