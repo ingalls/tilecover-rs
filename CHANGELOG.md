@@ -12,6 +12,14 @@
 
 ## Version History
 
+## v1.1.0
+
+- :bug: Fix `Point` & `MultiPoint` miscalc
+
+## v1.0.1
+
+- :arrow_up: Update `geo` to `0.12`
+
 ## v1.0.0
 
 - :tada: Add support for `Polygon` and `MultiPolygon` types
