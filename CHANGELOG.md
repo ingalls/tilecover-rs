@@ -12,6 +12,10 @@
 
 ## Version History
 
+## v2.0.0
+
+- Update `geo@0.14.x`
+
 ## v1.1.1
 
 - Version bump
